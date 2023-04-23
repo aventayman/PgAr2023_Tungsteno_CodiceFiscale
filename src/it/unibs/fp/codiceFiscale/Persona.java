@@ -17,7 +17,8 @@ public class Persona {
         this.dataNascita = data;
     }
 
-    public static void aggiungiPersona(XMLStreamReader xmlr, List<Persona> persone) throws XMLStreamException {
+    public static void aggiungiPersona(XMLStreamReader xmlr, List<Persona> persone) throws XMLStreamException
+    {
         String nome, cognome, sesso, comune, dataNascita;
         xmlr.next();
         nome = xmlr.getText();

@@ -11,7 +11,7 @@ public class Parsing {
 
     //File xmlfile = new File();
 
-    private final int NUMERO_PERSONE = 1000;
+    private final int NUMERO_PERSONE = 1000; //Non sono sicuro di come prendere il numero i quindi intanto è così e sito
     public void creaListaPersone() throws XMLStreamException {
         for (int i = 0; i < NUMERO_PERSONE; i++) {
             xmlr.next();
