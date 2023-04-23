@@ -6,12 +6,12 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Parsing {
-    XMLStreamReader xmlr = null;
+    XMLStreamReader xmlr;
     ArrayList<Persona> listaPersone;
 
     //File xmlfile = new File();
 
-    private final int NUMERO_PERSONE = 1000; //Non sono sicuro di come prendere il numero i quindi intanto è così e sito
+    private final int NUMERO_PERSONE = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
     public void creaListaPersone() throws XMLStreamException {
         for (int i = 0; i < NUMERO_PERSONE; i++) {
             xmlr.next();

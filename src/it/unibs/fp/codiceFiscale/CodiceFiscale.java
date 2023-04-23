@@ -3,16 +3,16 @@ package it.unibs.fp.codiceFiscale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+
 
 public class CodiceFiscale {
 
-    ArrayList<Comune> comuni;
-    private final int NUMERO_COMUNI = 8092;
-    XMLStreamReader xmlr = null;
+    HashMap<String, String> comuni = new HashMap<>();
+    XMLStreamReader xmlr;
+    private final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
 
-    public static void aggiungiComune(XMLStreamReader xmlr, List<Comune> comuni) throws XMLStreamException
+    public void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException
     {
         String codice, nome;
 
@@ -23,15 +23,14 @@ public class CodiceFiscale {
         xmlr.next();
         xmlr.next();
 
-        Comune comune = new Comune(nome, codice);
-        comuni.add(comune);
+        comuni.put(nome, codice);
     }
 
-    public void creaListaComuni() throws XMLStreamException
+    public void creaMappaComuni() throws XMLStreamException
     {
         for (int i=0; i < NUMERO_COMUNI; i++){
             xmlr.next();
-            aggiungiComune(xmlr, comuni);
+            aggiungiComune(xmlr);
         }
     }
 }
