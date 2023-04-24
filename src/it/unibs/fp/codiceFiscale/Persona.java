@@ -19,7 +19,10 @@ public class Persona {
 
     public static void aggiungiPersona(XMLStreamReader xmlr, List<Persona> persone) throws XMLStreamException
     {
-        String nome, cognome, sesso, comune, dataNascita;
+
+
+        String nome, cognome, sesso, comune, dataNascita, pippo;
+        String __nome, __cognome, __sesso, __comune, __dataNascita, __pippo;
         xmlr.next();
         nome = xmlr.getText();
         xmlr.next();
