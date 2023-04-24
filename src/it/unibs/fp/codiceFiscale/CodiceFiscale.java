@@ -85,4 +85,13 @@ public class CodiceFiscale {
             codice.append(n);
         }
     }
+
+    public void codiceComune (HashMap listaComuni, Persona persona) {
+        String comune = persona.getComune();
+        //Da completare
+    }
+
+
+
+
 }
