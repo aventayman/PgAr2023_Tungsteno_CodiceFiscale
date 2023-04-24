@@ -17,12 +17,17 @@ public class Persona {
         this.dataNascita = data;
     }
 
+
+    /**
+     * Metodo per aggiungere un nuovo oggetto persona all'interno della lista di persone
+     * @param xmlr oggetto XMLStreamReader per decodificare il file XML
+     * @param persone la lista a cui aggiungere la nuova persona
+     * @throws XMLStreamException
+     */
     public static void aggiungiPersona(XMLStreamReader xmlr, List<Persona> persone) throws XMLStreamException
     {
-
-
+        //Creazione di variabili temporanee da inserire alla fine in un nuovo oggetto persona
         String nome, cognome, sesso, comune, dataNascita;
-
         xmlr.next();
         nome = xmlr.getText();
         xmlr.next();
@@ -40,11 +45,16 @@ public class Persona {
         xmlr.next();
         xmlr.next();
 
+        //Creazione del nuovo oggetto persona e del relativo codice fiscale
         Persona persona = new Persona(nome, cognome, sesso, comune, dataNascita);
         //odiceFiscale.creaCodice(persona);
 
+        //Aggiunta del nuovo oggetto Persona nella lista di persone
         persone.add(persona);
     }
+
+
+    //Getter e Setter per la classe Persona
 
     public String getCodiceFiscale() {
         return codiceFiscale;

@@ -10,10 +10,17 @@ public class CodiceFiscale {
 
     HashMap<String, String> comuni = new HashMap<>();
     XMLStreamReader xmlr;
+
+    //Variabile final che memorizza il numero di comuni presenti nel documento XML
     private final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
 
-    public void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException
-    {
+
+    /**
+     * Metodo che aggiunge i metodi presi dal file XML in una Hashmap
+     * @param xmlr oggetto XMLStreamReader per decodificare il file XML
+     * @throws XMLStreamException
+     */
+    public void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException {
         String codice, nome;
 
         xmlr.next();
@@ -26,15 +33,23 @@ public class CodiceFiscale {
         comuni.put(nome, codice);
     }
 
-    public void creaMappaComuni() throws XMLStreamException
-    {
+    /**
+     * Creo la mappa che associa ai comuni i codici identificativi relativi
+     * @throws XMLStreamException
+     */
+    public void creaMappaComuni() throws XMLStreamException {
         for (int i=0; i < NUMERO_COMUNI; i++){
             xmlr.next();
             aggiungiComune(xmlr);
         }
     }
 
-    public void annoNascita(StringBuilder codice, Persona persona) {
+    /**
+     * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa all'anno di nascita della persona
+     * @param codice codice a cui aggiungere la parte relativa all'anno di nascita
+     * @param persona persona a cui è assegnato il codice fiscale
+     */
+    public void addAnnoNascita(StringBuilder codice, Persona persona) {
 
         String data = persona.getDataNascita();
         StringBuilder anno = new StringBuilder();
@@ -43,7 +58,13 @@ public class CodiceFiscale {
         codice.append(anno);
     }
 
-    public void meseNascita(StringBuilder codice, Persona persona ) {
+
+    /**
+     * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa al mese di nascita della persona
+     * @param codice codice a cui aggiungere la parte relativa al mese di nascita
+     * @param persona persona a cui è assegnato il codice fiscale
+     */
+    public void addMeseNascita(StringBuilder codice, Persona persona ) {
 
         String data = persona.getDataNascita();
         StringBuilder mese = new StringBuilder();
@@ -73,7 +94,12 @@ public class CodiceFiscale {
 
     }
 
-    public void giornoNascita(StringBuilder codice, Persona persona) {
+    /**
+     * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa al giorno di nascita della persona
+     * @param codice codice a cui aggiungere la parte relativa al giorno di nascita
+     * @param persona persona a cui è assegnato il codice fiscale
+     */
+    public void addGiornoNascita(StringBuilder codice, Persona persona) {
 
         String giorno = persona.getDataNascita().substring(persona.getDataNascita().length() - 2);
         if (persona.getSesso().equals("M") ){
@@ -86,12 +112,22 @@ public class CodiceFiscale {
         }
     }
 
-    public void codiceComune (HashMap listaComuni, Persona persona) {
+    /**
+     * Metodo che restituisce il codice relativo al comune di nascita della persona inserita
+     * @param persona persona di cui è richiesto il codice del comune di nascita
+     * @return codice alfanumerico del comune di nascita
+     */
+    public String codiceComune (Persona persona) {
         String comune = persona.getComune();
-        //Da completare
+        return comuni.get(persona.getComune());
     }
 
-
-
-
+    /**
+     * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa al comune di nascita della persona
+     * @param codice codice a cui aggiungere la parte relativa al comune di nascita
+     * @param persona persona a cui è assegnato il codice fiscale
+     */
+    public void addCodiceComune(StringBuilder codice, Persona persona){
+        codice.append(codiceComune(persona));
+    }
 }
