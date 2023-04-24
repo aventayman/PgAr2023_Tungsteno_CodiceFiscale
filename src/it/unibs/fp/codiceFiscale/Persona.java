@@ -28,26 +28,32 @@ public class Persona {
     {
         //Creazione di variabili temporanee da inserire alla fine in un nuovo oggetto persona
         String nome, cognome, sesso, comune, dataNascita;
-        xmlr.next();
-        nome = xmlr.getText();
-        xmlr.next();
-        xmlr.next();
-        cognome = xmlr.getText();
-        xmlr.next();
-        xmlr.next();
-        sesso = xmlr.getText();
-        xmlr.next();
-        xmlr.next();
-        comune = xmlr.getText();
-        xmlr.next();
-        xmlr.next();
-        dataNascita = xmlr.getText();
-        xmlr.next();
+        nome = cognome = sesso = comune = dataNascita = null;
+
+        while (!xmlr.isEndElement() && !xmlr.getLocalName().equals("persona"))
+        {
+            if (xmlr.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                String tag = xmlr.getLocalName();
+                String testo = xmlr.getText();
+                switch (tag) {
+                    case "nome" -> nome = testo;
+                    case "cognome" -> cognome = testo;
+                    case "sesso" -> sesso = testo;
+                    case "data_nascita" -> dataNascita = testo;
+                    case "comune_nascita" -> comune = testo;
+                }
+                xmlr.next();
+            }
+            else
+                xmlr.next();
+        }
+        //Preparo lo StreamReader per il ciclo della prossima persona, in modo che non rimanga
+        //bloccato sull'ultimo tag persona e non entri nemmeno nel ciclo while sovrastante.
         xmlr.next();
 
         //Creazione del nuovo oggetto persona e del relativo codice fiscale
         Persona persona = new Persona(nome, cognome, sesso, comune, dataNascita);
-        //odiceFiscale.creaCodice(persona);
+        CodiceFiscale.creaCodice(persona);
 
         //Aggiunta del nuovo oggetto Persona nella lista di persone
         persone.add(persona);
@@ -55,14 +61,6 @@ public class Persona {
 
 
     //Getter e Setter per la classe Persona
-
-    public String getCodiceFiscale() {
-        return codiceFiscale;
-    }
-
-    public void setCodiceFiscale(String codiceFiscale) {
-        this.codiceFiscale = codiceFiscale;
-    }
 
     public String getNome() {
         return nome;
@@ -82,5 +80,13 @@ public class Persona {
 
     public String getDataNascita() {
         return dataNascita;
+    }
+
+    public String getCodiceFiscale() {
+        return codiceFiscale;
+    }
+
+    public void setCodiceFiscale(String codiceFiscale) {
+        this.codiceFiscale = codiceFiscale;
     }
 }

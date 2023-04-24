@@ -3,12 +3,12 @@ package it.unibs.fp.codiceFiscale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.HashMap;
+import java.util.*;
 
 
 public class CodiceFiscale {
 
-    HashMap<String, String> comuni = new HashMap<>();
+    Map<String, String> comuni = new HashMap<>();
     XMLStreamReader xmlr;
 
     //Variabile final che memorizza il numero di comuni presenti nel documento XML
@@ -129,5 +129,49 @@ public class CodiceFiscale {
      */
     public void addCodiceComune(StringBuilder codice, Persona persona){
         codice.append(codiceComune(persona));
+    }
+
+    private static void aggiungiNome(StringBuilder codiceFiscale, String nome) {
+        nome = nome.toUpperCase();
+
+        StringBuilder nomeConsonanti = new StringBuilder();
+        StringBuilder nomeVocali = new StringBuilder();
+
+        List<Character> vocali = new ArrayList<>(Arrays.asList('A', 'E', 'I', 'O', 'U'));
+
+        char [] lettere = nome.toCharArray();
+
+        for (char lettera : lettere) {
+            if (vocali.contains(lettera))
+                nomeVocali.append(lettera);
+            else if (lettera >= 'A' && lettera <= 'Z')
+                nomeConsonanti.append(lettera);
+        }
+
+        StringBuilder tempCodice = new StringBuilder();
+
+        //Aggiungo al codice le consonanti del nome
+        tempCodice.append(nomeConsonanti);
+
+        //Se le consonanti non sono sufficienti aggiungo le vocali
+        if (tempCodice.length() < 3)
+            tempCodice.append(nomeVocali);
+
+        //Se le vocali non sono sufficienti aggiungo X
+        if (tempCodice.length() < 3)
+            for (int i = 0; i < 3 - tempCodice.length(); i++)
+                tempCodice.append("X");
+
+        codiceFiscale.append(tempCodice.substring(0, 3));
+    }
+
+    public static void creaCodice(Persona persona) {
+        StringBuilder codiceFiscale = new StringBuilder();
+
+        //Aggiunta dei caratteri del cognome nel codice fiscale
+        aggiungiNome(codiceFiscale, persona.getCognome());
+
+        //Aggiunta dei caratteri del nome nel codice fiscale
+        aggiungiNome(codiceFiscale, persona.getNome());
     }
 }
