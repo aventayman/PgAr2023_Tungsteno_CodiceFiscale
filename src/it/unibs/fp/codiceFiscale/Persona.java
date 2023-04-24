@@ -21,8 +21,8 @@ public class Persona {
     {
 
 
-        String nome, cognome, sesso, comune, dataNascita, pippo;
-        String __nome, __cognome, __sesso, __comune, __dataNascita, __pippo;
+        String nome, cognome, sesso, comune, dataNascita;
+
         xmlr.next();
         nome = xmlr.getText();
         xmlr.next();
@@ -52,5 +52,25 @@ public class Persona {
 
     public void setCodiceFiscale(String codiceFiscale) {
         this.codiceFiscale = codiceFiscale;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public String getSesso() {
+        return sesso;
+    }
+
+    public String getComune() {
+        return comune;
+    }
+
+    public String getDataNascita() {
+        return dataNascita;
     }
 }
