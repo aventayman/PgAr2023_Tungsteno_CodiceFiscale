@@ -3,6 +3,7 @@ package it.unibs.fp.codiceFiscale;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
 public class Persona {
@@ -30,26 +31,32 @@ public class Persona {
         String nome, cognome, sesso, comune, dataNascita;
         nome = cognome = sesso = comune = dataNascita = null;
 
-        while (!xmlr.isEndElement() && !xmlr.getLocalName().equals("persona"))
-        {
-            if (xmlr.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                String tag = xmlr.getLocalName();
-                String testo = xmlr.getText();
-                switch (tag) {
-                    case "nome" -> nome = testo;
-                    case "cognome" -> cognome = testo;
-                    case "sesso" -> sesso = testo;
-                    case "data_nascita" -> dataNascita = testo;
-                    case "comune_nascita" -> comune = testo;
+        boolean running = true;
+        while (running) {
+            switch (xmlr.getEventType()) {
+                case (XMLEvent.START_ELEMENT) -> {
+                    String tag = xmlr.getLocalName();
+                    xmlr.next();
+                    String testo = xmlr.getText();
+                    switch (tag) {
+                        case "nome" -> nome = testo;
+                        case "cognome" -> cognome = testo;
+                        case "sesso" -> sesso = testo;
+                        case "data_nascita" -> dataNascita = testo;
+                        case "comune_nascita" -> comune = testo;
+                    }
                 }
-                xmlr.next();
+                case (XMLEvent.END_ELEMENT) -> {
+                    if (xmlr.getLocalName().equals("persona"))
+                        running = false;
+
+                    xmlr.next();
+                }
             }
-            else
+
+            if (xmlr.hasNext())
                 xmlr.next();
         }
-        //Preparo lo StreamReader per il ciclo della prossima persona, in modo che non rimanga
-        //bloccato sull'ultimo tag persona e non entri nemmeno nel ciclo while sovrastante.
-        xmlr.next();
 
         //Creazione del nuovo oggetto persona e del relativo codice fiscale
         Persona persona = new Persona(nome, cognome, sesso, comune, dataNascita);
@@ -88,5 +95,17 @@ public class Persona {
 
     public void setCodiceFiscale(String codiceFiscale) {
         this.codiceFiscale = codiceFiscale;
+    }
+
+    @Override
+    public String toString() {
+        return "Persona{" +
+                "nome='" + nome + '\'' +
+                ", cognome='" + cognome + '\'' +
+                ", sesso='" + sesso + '\'' +
+                ", comune='" + comune + '\'' +
+                ", dataNascita='" + dataNascita + '\'' +
+                ", codiceFiscale='" + codiceFiscale + '\'' +
+                '}';
     }
 }
