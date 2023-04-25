@@ -8,38 +8,35 @@ import java.util.*;
 
 public class CodiceFiscale {
 
-    Map<String, String> comuni = new HashMap<>();
-    XMLStreamReader xmlr;
-
-    //Variabile final che memorizza il numero di comuni presenti nel documento XML
-    private final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
-
+    public static Map<String, String> comuni = new HashMap<>();
 
     /**
      * Metodo che aggiunge i metodi presi dal file XML in una Hashmap
      * @param xmlr oggetto XMLStreamReader per decodificare il file XML
      * @throws XMLStreamException
      */
-    public void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException {
+    private static void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException {
         String codice, nome;
+        codice = nome = null;
 
         xmlr.next();
-        nome = xmlr.getText();
-        xmlr.next();
-        codice = xmlr.getText();
-        xmlr.next();
-        xmlr.next();
-
+        switch (xmlr.getLocalName()) {
+            case ("nome") -> nome = xmlr.getText().toUpperCase();
+            case ("codice") -> codice = xmlr.getText().toUpperCase();
+        }
         comuni.put(nome, codice);
+        xmlr.next();
     }
 
     /**
      * Creo la mappa che associa ai comuni i codici identificativi relativi
+     * @param xmlr oggetto XMLStreamReader per decodificare il file dei comuni
      * @throws XMLStreamException
      */
-    public void creaMappaComuni() throws XMLStreamException {
+    public static void creaMappaComuni(XMLStreamReader xmlr) throws XMLStreamException {
+        final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
+        xmlr.next();
         for (int i=0; i < NUMERO_COMUNI; i++){
-            xmlr.next();
             aggiungiComune(xmlr);
         }
     }
@@ -47,33 +44,22 @@ public class CodiceFiscale {
     /**
      * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa all'anno di nascita della persona
      * @param codice codice a cui aggiungere la parte relativa all'anno di nascita
-     * @param persona persona a cui è assegnato il codice fiscale
+     * @param data data di nascita della persona
      */
-    public void addAnnoNascita(StringBuilder codice, Persona persona) {
-
-        String data = persona.getDataNascita();
-        StringBuilder anno = new StringBuilder();
-        anno.append(data.charAt(2));
-        anno.append(data.charAt(3));
+    private static void aggiungiAnnoNascita(StringBuilder codice, String data) {
+        String anno = data.substring(2, 4);
         codice.append(anno);
     }
-
 
     /**
      * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa al mese di nascita della persona
      * @param codice codice a cui aggiungere la parte relativa al mese di nascita
-     * @param persona persona a cui è assegnato il codice fiscale
+     * @param data data di nascita della persona
      */
-    public void addMeseNascita(StringBuilder codice, Persona persona ) {
+    private static void aggiungiMeseNascita(StringBuilder codice, String data) {
+        String mese = data.substring(5, 7);
 
-        String data = persona.getDataNascita();
-        StringBuilder mese = new StringBuilder();
-        mese.append(data.charAt(5));
-        mese.append(data.charAt(6));
-
-        String meseString = mese.toString();
-        String letteraMese = switch (meseString) {
-
+        String letteraMese = switch (mese) {
             case "01" -> "A";
             case "02" -> "B";
             case "03" -> "C";
@@ -85,13 +71,11 @@ public class CodiceFiscale {
             case "09" -> "P";
             case "10" -> "R";
             case "11" -> "S";
-
-            default -> "T";
-
+            case "12" -> "T";
+            //In caso il mese sia sbagliato inseriamo una lettera di controllo
+            default -> "Z";
         };
-
         codice.append(letteraMese);
-
     }
 
     /**
@@ -99,12 +83,10 @@ public class CodiceFiscale {
      * @param codice codice a cui aggiungere la parte relativa al giorno di nascita
      * @param persona persona a cui è assegnato il codice fiscale
      */
-    public void addGiornoNascita(StringBuilder codice, Persona persona) {
-
+    private static void aggiungiGiornoNascita(StringBuilder codice, Persona persona) {
         String giorno = persona.getDataNascita().substring(persona.getDataNascita().length() - 2);
-        if (persona.getSesso().equals("M") ){
+        if (persona.getSesso().equals("M"))
             codice.append(giorno);
-        }
         else {
             int n = Integer.parseInt(giorno);
             n += 40;
@@ -113,22 +95,14 @@ public class CodiceFiscale {
     }
 
     /**
-     * Metodo che restituisce il codice relativo al comune di nascita della persona inserita
-     * @param persona persona di cui è richiesto il codice del comune di nascita
-     * @return codice alfanumerico del comune di nascita
-     */
-    public String codiceComune (Persona persona) {
-        String comune = persona.getComune();
-        return comuni.get(persona.getComune());
-    }
-
-    /**
      * Metodo che aggiunge al codice inserito la parte di codice fiscale relativa al comune di nascita della persona
      * @param codice codice a cui aggiungere la parte relativa al comune di nascita
-     * @param persona persona a cui è assegnato il codice fiscale
+     * @param comune comune di residenza della persona
      */
-    public void addCodiceComune(StringBuilder codice, Persona persona){
-        codice.append(codiceComune(persona));
+    private static void aggiungiCodiceComune(StringBuilder codice, String comune){
+        comune = comune.toUpperCase();
+        String codiceComune = comuni.get(comune);
+        codice.append(codiceComune);
     }
 
     private static void aggiungiNome(StringBuilder codiceFiscale, String nome) {
@@ -173,5 +147,22 @@ public class CodiceFiscale {
 
         //Aggiunta dei caratteri del nome nel codice fiscale
         aggiungiNome(codiceFiscale, persona.getNome());
+
+        //Aggiunta dei caratteri dell'anno di nascita
+        aggiungiAnnoNascita(codiceFiscale, persona.getDataNascita());
+
+        //Aggiunta dei caratteri del mese di nascita
+        aggiungiMeseNascita(codiceFiscale, persona.getDataNascita());
+
+        //Aggiunta dei caratteri del giorno di nascita
+        aggiungiGiornoNascita(codiceFiscale, persona);
+
+        //Aggiunta dei caratteri del comune di nascita
+        aggiungiCodiceComune(codiceFiscale, persona.getComune());
+
+        //TO-DO: Aggiunta del carattere di controllo
+
+        //Assegnamento del codice fiscale alla persona
+        persona.setCodiceFiscale(codiceFiscale.toString());
     }
 }
