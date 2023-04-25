@@ -3,6 +3,7 @@ package it.unibs.fp.codiceFiscale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 import java.util.*;
 
 
@@ -19,13 +20,39 @@ public class CodiceFiscale {
         String codice, nome;
         codice = nome = null;
 
-        xmlr.next();
-        switch (xmlr.getLocalName()) {
-            case ("nome") -> nome = xmlr.getText().toUpperCase();
-            case ("codice") -> codice = xmlr.getText().toUpperCase();
+        boolean running = true;
+        while (running) {
+            switch (xmlr.getEventType()) {
+                //Se si tratta di un tag di apertura
+                case (XMLEvent.START_ELEMENT) -> {
+                    switch (xmlr.getLocalName()) {
+                        case ("nome") -> {
+                            //Avanzare di un posto per salvare il nome del paese
+                            xmlr.next();
+                            nome = xmlr.getText().toUpperCase();
+                        }
+                        case ("codice") -> {
+                            //Avanzare di un posto per salvare il codice del paese
+                            xmlr.next();
+                            codice = xmlr.getText().toUpperCase();
+                        }
+                    }
+                }
+                //Se si tratta di un tag di chiusura
+                case (XMLEvent.END_ELEMENT) -> {
+                    //Se è il closing-tag del comune allora termina di controllare per lo specifico comune
+                    if (xmlr.getLocalName().equals("comune"))
+                        running = false;
+
+                    //In ogni caso se è un closing-tag andare al successivo
+                    xmlr.next();
+                }
+            }
+            //Questa condizione serve in modo che non dia un errore perché ci si trova alla fine del file
+            if (xmlr.hasNext())
+                xmlr.next();
         }
         comuni.put(nome, codice);
-        xmlr.next();
     }
 
     /**
@@ -34,9 +61,11 @@ public class CodiceFiscale {
      * @throws XMLStreamException
      */
     public static void creaMappaComuni(XMLStreamReader xmlr) throws XMLStreamException {
-        final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(XMLStreamReader.START_DOCUMENT));
         xmlr.next();
-        for (int i=0; i < NUMERO_COMUNI; i++){
+        final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(0));
+        xmlr.next();
+        xmlr.next();
+        for (int i = 0; i < NUMERO_COMUNI; i++){
             aggiungiComune(xmlr);
         }
     }
@@ -133,10 +162,123 @@ public class CodiceFiscale {
 
         //Se le vocali non sono sufficienti aggiungo X
         if (tempCodice.length() < 3)
-            for (int i = 0; i < 3 - tempCodice.length(); i++)
-                tempCodice.append("X");
+            tempCodice.append("X".repeat(Math.max(0, 3 - tempCodice.length())));
 
         codiceFiscale.append(tempCodice.substring(0, 3));
+    }
+
+    private static final Map<Character, Integer> tabellaDispari = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>('0', 1),
+            new AbstractMap.SimpleEntry<>('1', 0),
+            new AbstractMap.SimpleEntry<>('2', 5),
+            new AbstractMap.SimpleEntry<>('3', 7),
+            new AbstractMap.SimpleEntry<>('4', 9),
+            new AbstractMap.SimpleEntry<>('5', 13),
+            new AbstractMap.SimpleEntry<>('6', 15),
+            new AbstractMap.SimpleEntry<>('7', 17),
+            new AbstractMap.SimpleEntry<>('8', 19),
+            new AbstractMap.SimpleEntry<>('9', 21),
+            new AbstractMap.SimpleEntry<>('A', 1),
+            new AbstractMap.SimpleEntry<>('B', 0),
+            new AbstractMap.SimpleEntry<>('C', 5),
+            new AbstractMap.SimpleEntry<>('D', 7),
+            new AbstractMap.SimpleEntry<>('E', 9),
+            new AbstractMap.SimpleEntry<>('F', 13),
+            new AbstractMap.SimpleEntry<>('G', 15),
+            new AbstractMap.SimpleEntry<>('H', 17),
+            new AbstractMap.SimpleEntry<>('I', 19),
+            new AbstractMap.SimpleEntry<>('J', 21),
+            new AbstractMap.SimpleEntry<>('K', 2),
+            new AbstractMap.SimpleEntry<>('L', 4),
+            new AbstractMap.SimpleEntry<>('M', 18),
+            new AbstractMap.SimpleEntry<>('N', 20),
+            new AbstractMap.SimpleEntry<>('O', 11),
+            new AbstractMap.SimpleEntry<>('P', 3),
+            new AbstractMap.SimpleEntry<>('Q', 6),
+            new AbstractMap.SimpleEntry<>('R', 8),
+            new AbstractMap.SimpleEntry<>('S', 12),
+            new AbstractMap.SimpleEntry<>('T', 14),
+            new AbstractMap.SimpleEntry<>('U', 16),
+            new AbstractMap.SimpleEntry<>('V', 10),
+            new AbstractMap.SimpleEntry<>('W', 22),
+            new AbstractMap.SimpleEntry<>('X', 25),
+            new AbstractMap.SimpleEntry<>('Y', 24),
+            new AbstractMap.SimpleEntry<>('Z', 23)
+    );
+
+    private static final Map<Character, Integer> tabellaPari = Map.ofEntries(
+            new AbstractMap.SimpleEntry<>('0', 0),
+            new AbstractMap.SimpleEntry<>('1', 1),
+            new AbstractMap.SimpleEntry<>('2', 2),
+            new AbstractMap.SimpleEntry<>('3', 3),
+            new AbstractMap.SimpleEntry<>('4', 4),
+            new AbstractMap.SimpleEntry<>('5', 5),
+            new AbstractMap.SimpleEntry<>('6', 6),
+            new AbstractMap.SimpleEntry<>('7', 7),
+            new AbstractMap.SimpleEntry<>('8', 8),
+            new AbstractMap.SimpleEntry<>('9', 9),
+            new AbstractMap.SimpleEntry<>('A', 0),
+            new AbstractMap.SimpleEntry<>('B', 1),
+            new AbstractMap.SimpleEntry<>('C', 2),
+            new AbstractMap.SimpleEntry<>('D', 3),
+            new AbstractMap.SimpleEntry<>('E', 4),
+            new AbstractMap.SimpleEntry<>('F', 5),
+            new AbstractMap.SimpleEntry<>('G', 6),
+            new AbstractMap.SimpleEntry<>('H', 7),
+            new AbstractMap.SimpleEntry<>('I', 8),
+            new AbstractMap.SimpleEntry<>('J', 9),
+            new AbstractMap.SimpleEntry<>('K', 10),
+            new AbstractMap.SimpleEntry<>('L', 11),
+            new AbstractMap.SimpleEntry<>('M', 12),
+            new AbstractMap.SimpleEntry<>('N', 13),
+            new AbstractMap.SimpleEntry<>('O', 14),
+            new AbstractMap.SimpleEntry<>('P', 15),
+            new AbstractMap.SimpleEntry<>('Q', 16),
+            new AbstractMap.SimpleEntry<>('R', 17),
+            new AbstractMap.SimpleEntry<>('S', 18),
+            new AbstractMap.SimpleEntry<>('T', 19),
+            new AbstractMap.SimpleEntry<>('U', 20),
+            new AbstractMap.SimpleEntry<>('V', 21),
+            new AbstractMap.SimpleEntry<>('W', 22),
+            new AbstractMap.SimpleEntry<>('X', 23),
+            new AbstractMap.SimpleEntry<>('Y', 24),
+            new AbstractMap.SimpleEntry<>('Z', 25)
+    );
+
+    private static void aggiungiCarattereControllo(StringBuilder codiceFiscale) {
+        StringBuilder codicePari = new StringBuilder();
+        StringBuilder codiceDispari = new StringBuilder();
+
+        for (int i = 0; i < codiceFiscale.length(); i++) {
+            //Se il carattere è in posizione pari, partendo da uno, aggiungere al codicePari
+            if ((i+1) % 2 == 0)
+                codicePari.append(codiceFiscale.charAt(i));
+            //Se il carattere è in posizione dispari aggiungere a codiceDispari
+            else
+                codiceDispari.append(codiceFiscale.charAt(i));
+        }
+
+        char [] caratteriPari = codicePari.toString().toCharArray();
+        char [] caratteriDispari = codiceDispari.toString().toCharArray();
+
+        int somma = 0;
+
+        for (char carattere : caratteriPari) {
+            try {
+                somma += tabellaPari.get(carattere);
+            } catch (Exception ignored) {}
+        }
+
+
+        for (char carattere : caratteriDispari) {
+            try {
+                somma += tabellaDispari.get(carattere);
+            } catch (Exception ignored) {}
+        }
+
+        int resto = somma % 26;
+
+        codiceFiscale.append((char)('A' + resto));
     }
 
     public static void creaCodice(Persona persona) {
@@ -160,7 +302,8 @@ public class CodiceFiscale {
         //Aggiunta dei caratteri del comune di nascita
         aggiungiCodiceComune(codiceFiscale, persona.getComune());
 
-        //TO-DO: Aggiunta del carattere di controllo
+        //Aggiunta del carattere di controllo
+        aggiungiCarattereControllo(codiceFiscale);
 
         //Assegnamento del codice fiscale alla persona
         persona.setCodiceFiscale(codiceFiscale.toString());
