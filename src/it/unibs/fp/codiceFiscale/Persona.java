@@ -97,13 +97,12 @@ public class Persona {
      * @param listaCodici lista dei codici per il confronto
      * @param popolazione popolazione a cui modificare la varianile presente
      */
-    public static void isPresente (List<CodiceFiscale> listaCodici, List<Persona> popolazione){
+    public static void controllaPresenza (List<CodiceFiscale> listaCodici, List<Persona> popolazione){
         for (CodiceFiscale codice: listaCodici){
             for (Persona persona: popolazione){
                 //Se i codici sono uguali, la variabile presente diventa true
-                if(persona.getCodiceFiscale().equals(codice)){
-                    persona.presente = true;
-                }
+                if(persona.getCodiceFiscale().equals(codice))
+                    persona.setPresente(true);
             }
         }
     }
@@ -141,6 +140,10 @@ public class Persona {
 
     public void setCodiceFiscale(CodiceFiscale codiceFiscale) {
         this.codiceFiscale = codiceFiscale;
+    }
+
+    public void setPresente(boolean presente) {
+        this.presente = presente;
     }
 
     @Override

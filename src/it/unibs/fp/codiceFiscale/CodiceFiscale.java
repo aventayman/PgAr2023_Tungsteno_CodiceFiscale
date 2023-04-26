@@ -10,7 +10,7 @@ import java.util.*;
 public class CodiceFiscale {
     private final String codice;
     private boolean valido = true;
-    private boolean spaiato = false;
+    private boolean spaiato = true;
 
     public CodiceFiscale(String codice) {
         this.codice = codice;
@@ -274,7 +274,7 @@ public class CodiceFiscale {
 
         //Se il codice contiene un numero di caratteri diverso da 16 il codice è invalido
         if (codice.length != 16) {
-            codiceFiscale.valido = false;
+            codiceFiscale.setValido(false);
             return;
         }
 
@@ -285,7 +285,7 @@ public class CodiceFiscale {
                 for (int posizioneCifra : posizioneCifre)
                     //Se la lettera si trova in posizione di una cifra il codice è invalido
                     if (i == posizioneCifra) {
-                        codiceFiscale.valido = false;
+                        codiceFiscale.setValido(false);
                         return;
                     }
             }
@@ -294,13 +294,13 @@ public class CodiceFiscale {
                 for (int posizioneLettera : posizioneLettere)
                     //Se la cifra si trova in posizione di una lettera il codice è invalido
                     if (i == posizioneLettera) {
-                        codiceFiscale.valido = false;
+                        codiceFiscale.setValido(false);
                         return;
                     }
             }
             //Se si tratta di un qualsiasi altro carattere il codice è invalido
             else {
-                codiceFiscale.valido = false;
+                codiceFiscale.setValido(false);
                 return;
             }
         }
@@ -316,7 +316,7 @@ public class CodiceFiscale {
         for (char mese : mesi30) {
             if (meseNascita == mese) {
                 if (giornoNascita < 1 || (giornoNascita > 30 && giornoNascita < 41) || giornoNascita > 70) {
-                    codiceFiscale.valido = false;
+                    codiceFiscale.setValido(false);
                     return;
                 }
                 meseEsistente = true;
@@ -327,7 +327,7 @@ public class CodiceFiscale {
         for (char mese : mesi31) {
             if (meseNascita == mese) {
                 if (giornoNascita < 1 || (giornoNascita > 31 && giornoNascita < 41) || giornoNascita > 71) {
-                    codiceFiscale.valido = false;
+                    codiceFiscale.setValido(false);
                     return;
                 }
                 meseEsistente = true;
@@ -349,13 +349,13 @@ public class CodiceFiscale {
         if (meseNascita == 'B') {
             if (bisestile) {
                 if (giornoNascita < 1 || (giornoNascita > 29 && giornoNascita < 41) || giornoNascita > 69) {
-                    codiceFiscale.valido = false;
+                    codiceFiscale.setValido(false);
                     return;
                 }
             }
             else {
                 if (giornoNascita < 1 || (giornoNascita > 28 && giornoNascita < 41) || giornoNascita > 68) {
-                    codiceFiscale.valido = false;
+                    codiceFiscale.setValido(false);
                     return;
                 }
             }
@@ -364,7 +364,7 @@ public class CodiceFiscale {
 
         //Se non è stato trovato il mese allora il codice è invalido
         if (!meseEsistente) {
-            codiceFiscale.valido = false;
+            codiceFiscale.setValido(false);
             return;
         }
 
@@ -372,12 +372,12 @@ public class CodiceFiscale {
         char carattereControllo = calcoloCarattereControllo(codiceFiscale.codice);
 
         if (codice[15] != carattereControllo) {
-            codiceFiscale.valido = false;
+            codiceFiscale.setValido(false);
             return;
         }
 
         //Se ha superato tutti i controlli ritorna true
-        codiceFiscale.valido = true;
+        codiceFiscale.setValido(true);
     }
 
     /**
@@ -441,7 +441,7 @@ public class CodiceFiscale {
         for (CodiceFiscale codice: listaCodici){
             for (Persona persona: popolazione){
                 if (codice.equals(persona.getCodiceFiscale())) {
-                    codice.spaiato = false;
+                    codice.setSpaiato(false);
                 }
             }
         }
@@ -455,8 +455,24 @@ public class CodiceFiscale {
         return spaiato;
     }
 
+    public void setValido(boolean valido) {
+        this.valido = valido;
+    }
+
+    public void setSpaiato(boolean spaiato) {
+        this.spaiato = spaiato;
+    }
+
     @Override
     public String toString() {
         return codice;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CodiceFiscale that = (CodiceFiscale) o;
+        return Objects.equals(codice, that.codice);
     }
 }

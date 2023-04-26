@@ -77,7 +77,7 @@ public class Main {
         //Eseguo i controlli necessari cambiando le variabili corrispondenti
         CodiceFiscale.codiciInvalidi(codiciFiscali);
         CodiceFiscale.codiciSpaiati(codiciFiscali, popolazione);
-        Persona.isPresente(codiciFiscali, popolazione);
+        Persona.controllaPresenza(codiciFiscali, popolazione);
 
         //Inizializzazione
         XMLOutputFactory xmlof;
