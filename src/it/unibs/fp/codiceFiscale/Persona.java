@@ -9,7 +9,7 @@ import java.util.List;
 public class Persona {
     private final String nome, cognome, sesso, comune, dataNascita;
     private CodiceFiscale codiceFiscale;
-    private boolean presente;
+    private boolean presente = true;
 
     public Persona(String nome, String cognome, String sesso, String comune, String data)
     {
@@ -66,6 +66,16 @@ public class Persona {
 
         //Aggiunta del nuovo oggetto Persona nella lista di persone
         persone.add(persona);
+    }
+
+
+    public static void creaPopolazione (List<Persona> popolazione, XMLStreamReader xmlrPersone) throws XMLStreamException {
+        xmlrPersone.next();
+        final int NUMERO_PERSONE = Integer.parseInt(xmlrPersone.getAttributeValue(0));
+        //System.out.println(xmlrPersone.getEventType());
+        //System.out.println(xmlrPersone.getLocalName());
+        for (int i = 0; i < NUMERO_PERSONE; i++)
+            Persona.aggiungiPersona(xmlrPersone, popolazione);
     }
 
 

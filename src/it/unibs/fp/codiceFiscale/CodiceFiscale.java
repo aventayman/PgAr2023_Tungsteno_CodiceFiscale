@@ -9,7 +9,8 @@ import java.util.*;
 
 public class CodiceFiscale {
     private final String codice;
-    private boolean valido;
+    private boolean valido = true;
+    private boolean spaiato = false;
 
     public CodiceFiscale(String codice) {
         this.codice = codice;
@@ -369,6 +370,67 @@ public class CodiceFiscale {
         //Se ha superato tutti i controlli ritorna true
         codiceFiscale.valido = true;
     }
+
+    /**
+     * Metodo che restituisce una lista di codici invalidi di una lista inserita
+     * @param listaCodici lista da cui si vogliono estrapolare i codici invalidi
+     * @return una lista di codici fiscali invalidi
+     */
+    public void codiciInvalidi (ArrayList<CodiceFiscale> listaCodici) {
+        for(CodiceFiscale codice: listaCodici){
+            codiceValido(codice);
+            if(!codice.valido){
+                codiciInvalidi.add(codice);
+            }
+        }
+        return codiciInvalidi;
+    }
+
+    /**
+     * Metodo che restituisce una lista di codici spaiati VALIDI presenti nella lista inserita
+     * @param listaCodici lista da cui si vogliono ricavare i codici spaiati
+     * @param popolazione i cui codici fiscali vanno confrontati con la lista inserita
+     * @return una lista di codici spaiati derivante da quella inserita
+     */
+    public ArrayList<CodiceFiscale> codiciSpaiati (ArrayList<CodiceFiscale> listaCodici, ArrayList<Persona> popolazione){
+        ArrayList<CodiceFiscale> codiciSpaiati = new ArrayList<>();
+        listaCodici.removeAll(codiciInvalidi(listaCodici));
+        for (CodiceFiscale codice: listaCodici){
+            boolean flag = false;
+            for (Persona persona: popolazione){
+                if(persona.getCodiceFiscale().equals(codice)){
+                    flag = true;
+                }
+            }
+            if(!flag){
+                codiciSpaiati.add(codice);
+            }
+        }
+        return codiciSpaiati;
+    }
+
+    /**
+     * Metodo che inserisce i codici fiscali del file nella lista data come attributo
+     * @param xmlrCodice oggetto riferito al file di codici
+     * @param listaCodici lista da riempire con i codici fiscali
+     * @throws XMLStreamException
+     */
+    public static void creaListaCodici (XMLStreamReader xmlrCodice, List<CodiceFiscale> listaCodici)throws XMLStreamException
+    {
+        xmlrCodice.next();
+        final int NUMERO_CODICI = Integer.parseInt(xmlrCodice.getAttributeValue(0));
+        for (int i = 0; i < NUMERO_CODICI; i++) {
+            CodiceFiscale codice = new CodiceFiscale(xmlrCodice.getText());
+            listaCodici.add(codice);
+            xmlrCodice.next();
+            xmlrCodice.next();
+        }
+    }
+
+    /**
+     * Metodo che aggiorna lo stato di presente delle persone, in base al file di confronto
+     */
+    public static void personeCodiceAppaiato ()
 
     @Override
     public String toString() {

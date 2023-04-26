@@ -12,13 +12,15 @@ public class Main {
     public static void main(String[] args) throws XMLStreamException {
         Persona ayman = new Persona("Ayman", "Marpicati", "M", "Brescia", "2003-03-22");
         Persona fede = new Persona("Federico", "Serafini", "M", "Ghedi", "2003-08-11");
-        Persona mirko = new Persona("Mirko", "Tedoldi", "M", "Gardone Val Trompia", "2003-07-24");
+        Persona mirko = new Persona("Mirko", "Tedoldi", "M", "Gardone Val Trompia", "2003-08-24");
 
         XMLInputFactory xmlif;
         XMLStreamReader xmlrComuni = null;
         XMLStreamReader xmlrPersone = null;
+        XMLStreamReader xmlrCodice = null;
         String pathComuni = "./TestFiles/Comuni.xml";
         String pathPersone = "./TestFiles/InputPersone.xml";
+        String pathCodici = "./TestFiles/CodiciFiscali.xml";
 
         try {
             xmlif = XMLInputFactory.newInstance();
@@ -36,6 +38,14 @@ public class Main {
             System.out.println(e.getMessage());
         }
 
+        try {
+            xmlif = XMLInputFactory.newInstance();
+            xmlrCodice = xmlif.createXMLStreamReader(pathCodici, new FileInputStream(pathCodici));
+        } catch (Exception e) {
+            System.out.println("Errore nell'inizializzazione del reader:");
+            System.out.println(e.getMessage());
+        }
+
         Comune.creaMappaComuni(xmlrComuni);
 
         CodiceFiscale.creaCodice(ayman);
@@ -47,13 +57,13 @@ public class Main {
         System.out.println(fede.getCodiceFiscale());
 
         List<Persona> popolazione = new ArrayList<>();
-        xmlrPersone.next();
-        final int NUMERO_PERSONE = Integer.parseInt(xmlrPersone.getAttributeValue(0));
-        System.out.println(xmlrPersone.getEventType());
-        System.out.println(xmlrPersone.getLocalName());
-        for (int i = 0; i < NUMERO_PERSONE; i++)
-            Persona.aggiungiPersona(xmlrPersone, popolazione);
+        List<CodiceFiscale> listaCodici = new ArrayList<>();
 
-        System.out.println(popolazione);
+        Persona.creaPopolazione(popolazione, xmlrPersone);
+        CodiceFiscale.creaListaCodici(xmlrCodice, listaCodici);
+
+        List<CodiceFiscale> codiciFiscali;
+        //System.out.println(popolazione);
+
     }
 }
