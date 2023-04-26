@@ -19,7 +19,7 @@ public class Main {
         Persona mirko = new Persona("Mirko", "Tedoldi", "M", "Gardone Val Trompia", "2003-08-24");
         */
 
-        XMLInputFactory xmlif;
+        XMLInputFactory xmlif = null;
         XMLStreamReader xmlrComuni = null;
         XMLStreamReader xmlrPersone = null;
         XMLStreamReader xmlrCodice = null;
@@ -63,11 +63,14 @@ public class Main {
 
        // Parsing.inizializzazione(pathCodici, xmlrCodice, xmlif);
 
+        assert xmlrComuni != null;
         Comune.creaMappaComuni(xmlrComuni);
         List<Persona> popolazione = new ArrayList<>();
         List<CodiceFiscale> codiciFiscali = new ArrayList<>();
 
+        assert xmlrPersone != null;
         Persona.creaPopolazione(popolazione, xmlrPersone);
+        assert xmlrCodice != null;
         CodiceFiscale.creaListaCodici(xmlrCodice, codiciFiscali);
 
         CodiceFiscale.codiciInvalidi(codiciFiscali);
@@ -76,7 +79,7 @@ public class Main {
 
 
 
-        XMLOutputFactory xmlof;
+        XMLOutputFactory xmlof = null;
         XMLStreamWriter xmlw = null;
 
         String pathOutput = "./TestFiles/CodiciPersone.xml";

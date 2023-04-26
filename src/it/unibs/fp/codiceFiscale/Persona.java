@@ -72,6 +72,7 @@ public class Persona {
 
     public static void creaPopolazione (List<Persona> popolazione, XMLStreamReader xmlrPersone) throws XMLStreamException {
         xmlrPersone.next();
+
         final int NUMERO_PERSONE = Integer.parseInt(xmlrPersone.getAttributeValue(0));
         for (int i = 0; i < NUMERO_PERSONE; i++)
             Persona.aggiungiPersona(xmlrPersone, popolazione);

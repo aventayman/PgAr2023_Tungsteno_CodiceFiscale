@@ -381,12 +381,36 @@ public class CodiceFiscale {
     {
         xmlrCodice.next();
         final int NUMERO_CODICI = Integer.parseInt(xmlrCodice.getAttributeValue(0));
-        for (int i = 0; i < NUMERO_CODICI; i++) {
-            CodiceFiscale codice = new CodiceFiscale(xmlrCodice.getText());
-            listaCodici.add(codice);
-            xmlrCodice.next();
-            xmlrCodice.next();
-        }
+        int counter = 0;
+
+        while (counter < NUMERO_CODICI) {
+           boolean running = true;
+           while (running) {
+               switch (xmlrCodice.getEventType()) {
+                   case (XMLEvent.START_ELEMENT) -> {
+                       String tag = xmlrCodice.getLocalName();
+                       if (tag.equals("codice")) {
+                           xmlrCodice.next();
+                           CodiceFiscale codice = new CodiceFiscale(xmlrCodice.getText());
+                           listaCodici.add(codice);
+                           xmlrCodice.next();
+                           counter++;
+                       }
+
+                   }
+                   case (XMLEvent.END_ELEMENT) -> {
+                       if (xmlrCodice.getLocalName().equals("codice"))
+                           running = false;
+
+                       xmlrCodice.next();
+                   }
+               }
+
+               if (xmlrCodice.hasNext())
+                   xmlrCodice.next();
+           }
+       }
+
     }
 
     /**
