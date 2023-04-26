@@ -307,7 +307,7 @@ public class CodiceFiscale {
 
         //Controllo dell'esistenza del mese e della correttezza dei giorni
         int giornoNascita = Integer.parseInt(codiceFiscale.codice.substring(9, 11));
-        int annoNascita = Integer.parseInt(codiceFiscale.codice.substring(5, 7));
+        int annoNascita = Integer.parseInt(codiceFiscale.codice.substring(6, 8));
         char meseNascita = codice[8];
 
         boolean meseEsistente = false;
@@ -402,7 +402,6 @@ public class CodiceFiscale {
                            xmlrCodice.next();
                            CodiceFiscale codice = new CodiceFiscale(xmlrCodice.getText());
                            listaCodici.add(codice);
-                           xmlrCodice.next();
                            counter++;
                        }
 

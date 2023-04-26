@@ -104,9 +104,9 @@ public class Parsing {
 
             xmlw.flush(); // svuota il buffer
             xmlw.close(); // chiusura del documento e delle risorse impiegate
+            System.out.println("Creazione del file completata");
         } catch (Exception e) { // se c’è un errore viene eseguita questa parte
             System.out.println("Errore nella scrittura");
         }
-        System.out.println("Creazione del file completata");
     }
 }
