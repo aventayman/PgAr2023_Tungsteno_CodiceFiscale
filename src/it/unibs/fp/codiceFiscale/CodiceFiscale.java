@@ -81,6 +81,11 @@ public class CodiceFiscale {
         codice.append(codiceComune);
     }
 
+    /**
+     * Metodo per aggiungere al codice la parte relativa al nome della persona
+     * @param codiceFiscale codice da modificare
+     * @param nome nome della persona
+     */
     private static void aggiungiNome(StringBuilder codiceFiscale, String nome) {
         nome = nome.toUpperCase();
 
@@ -256,6 +261,10 @@ public class CodiceFiscale {
         persona.setCodiceFiscale(new CodiceFiscale(codiceFiscale.toString()));
     }
 
+    /**
+     * Metodo per verificare la validità del codice fiscale inserito
+     * @param codiceFiscale di cui si vuole fare una verifica
+     */
     public static void codiceValido(CodiceFiscale codiceFiscale) {
         char [] codice = codiceFiscale.codice.toCharArray();
         int [] posizioneLettere = {0, 1, 2, 3, 4, 5, 8, 11, 15};
