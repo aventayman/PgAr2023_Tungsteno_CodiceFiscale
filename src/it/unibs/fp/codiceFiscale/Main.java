@@ -5,7 +5,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -19,14 +18,19 @@ public class Main {
         Persona mirko = new Persona("Mirko", "Tedoldi", "M", "Gardone Val Trompia", "2003-08-24");
         */
 
-        XMLInputFactory xmlif = null;
+        //Inizializzazione degli XMLStreamreader
+        XMLInputFactory xmlif;
         XMLStreamReader xmlrComuni = null;
         XMLStreamReader xmlrPersone = null;
         XMLStreamReader xmlrCodice = null;
+
+        //Path dei file
         String pathComuni = "./TestFiles/Comuni.xml";
         String pathPersone = "./TestFiles/InputPersone.xml";
         String pathCodici = "./TestFiles/CodiciFiscali.xml";
 
+
+        //Inizializzazione per l'input
         try {
             xmlif = XMLInputFactory.newInstance();
             xmlrComuni = xmlif.createXMLStreamReader(pathComuni, new FileInputStream(pathComuni));
@@ -61,27 +65,25 @@ public class Main {
         System.out.println(fede.getCodiceFiscale());
         */
 
-       // Parsing.inizializzazione(pathCodici, xmlrCodice, xmlif);
 
-        assert xmlrComuni != null;
+        //Creo le raccolte degli elementi forniti dai file xml
         Comune.creaMappaComuni(xmlrComuni);
         List<Persona> popolazione = new ArrayList<>();
         List<CodiceFiscale> codiciFiscali = new ArrayList<>();
 
-        assert xmlrPersone != null;
         Persona.creaPopolazione(popolazione, xmlrPersone);
-        assert xmlrCodice != null;
         CodiceFiscale.creaListaCodici(xmlrCodice, codiciFiscali);
 
+        //Eseguo i controlli necessari cambiando le variabili corrispondenti
         CodiceFiscale.codiciInvalidi(codiciFiscali);
         CodiceFiscale.codiciSpaiati(codiciFiscali, popolazione);
         Persona.isPresente(codiciFiscali, popolazione);
 
-
-
-        XMLOutputFactory xmlof = null;
+        //Inizializzazione
+        XMLOutputFactory xmlof;
         XMLStreamWriter xmlw = null;
 
+        //Percorso del file di output
         String pathOutput = "./TestFiles/CodiciPersone.xml";
 
         try {

@@ -432,7 +432,7 @@ public class CodiceFiscale {
     public static void codiciSpaiati (List<CodiceFiscale> listaCodici, List<Persona> popolazione){
         for (CodiceFiscale codice: listaCodici){
             for (Persona persona: popolazione){
-                if(persona.getCodiceFiscale().equals(codice)){
+                if (codice.equals(persona.getCodiceFiscale())) {
                     codice.spaiato = false;
                 }
             }
