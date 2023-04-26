@@ -256,7 +256,7 @@ public class CodiceFiscale {
         persona.setCodiceFiscale(new CodiceFiscale(codiceFiscale.toString()));
     }
 
-    public void codiceValido(CodiceFiscale codiceFiscale) {
+    public static void codiceValido(CodiceFiscale codiceFiscale) {
         char [] codice = codiceFiscale.codice.toCharArray();
         int [] posizioneLettere = {0, 1, 2, 3, 4, 5, 8, 11, 15};
         int [] posizioneCifre = {6, 7, 9, 10, 12, 13, 14};
@@ -372,44 +372,6 @@ public class CodiceFiscale {
     }
 
     /**
-     * Metodo che restituisce una lista di codici invalidi di una lista inserita
-     * @param listaCodici lista da cui si vogliono estrapolare i codici invalidi
-     * @return una lista di codici fiscali invalidi
-     */
-    public void codiciInvalidi (ArrayList<CodiceFiscale> listaCodici) {
-        for(CodiceFiscale codice: listaCodici){
-            codiceValido(codice);
-            if(!codice.valido){
-                codiciInvalidi.add(codice);
-            }
-        }
-        return codiciInvalidi;
-    }
-
-    /**
-     * Metodo che restituisce una lista di codici spaiati VALIDI presenti nella lista inserita
-     * @param listaCodici lista da cui si vogliono ricavare i codici spaiati
-     * @param popolazione i cui codici fiscali vanno confrontati con la lista inserita
-     * @return una lista di codici spaiati derivante da quella inserita
-     */
-    public ArrayList<CodiceFiscale> codiciSpaiati (ArrayList<CodiceFiscale> listaCodici, ArrayList<Persona> popolazione){
-        ArrayList<CodiceFiscale> codiciSpaiati = new ArrayList<>();
-        listaCodici.removeAll(codiciInvalidi(listaCodici));
-        for (CodiceFiscale codice: listaCodici){
-            boolean flag = false;
-            for (Persona persona: popolazione){
-                if(persona.getCodiceFiscale().equals(codice)){
-                    flag = true;
-                }
-            }
-            if(!flag){
-                codiciSpaiati.add(codice);
-            }
-        }
-        return codiciSpaiati;
-    }
-
-    /**
      * Metodo che inserisce i codici fiscali del file nella lista data come attributo
      * @param xmlrCodice oggetto riferito al file di codici
      * @param listaCodici lista da riempire con i codici fiscali
@@ -428,9 +390,38 @@ public class CodiceFiscale {
     }
 
     /**
-     * Metodo che aggiorna lo stato di presente delle persone, in base al file di confronto
+     * Metodo che modifica l'attributo valido della lista di codici secondo i criteri stabiliti
+     * @param listaCodici lista di cui si vuol modificare lo stato di validità
      */
-    public static void personeCodiceAppaiato ()
+    public static void codiciInvalidi (List<CodiceFiscale> listaCodici) {
+        for(CodiceFiscale codice: listaCodici){
+            codiceValido(codice);
+        }
+    }
+
+    /**
+     * Metodo che modifica l'attributo spaiato di ogni codice nella lista inserita
+     * Se il codice è presente nel file e appartiene a una persona della popolazione, allora spaiato diventa false
+     * @param listaCodici di codici di cui modificare l'attributo spaiato
+     * @param popolazione i cui codici fiscali vanno confrontati con la lista inserita
+     */
+    public static void codiciSpaiati (List<CodiceFiscale> listaCodici, List<Persona> popolazione){
+        for (CodiceFiscale codice: listaCodici){
+            for (Persona persona: popolazione){
+                if(persona.getCodiceFiscale().equals(codice)){
+                    codice.spaiato = false;
+                }
+            }
+        }
+    }
+
+    public boolean isValido() {
+        return valido;
+    }
+
+    public boolean isSpaiato() {
+        return spaiato;
+    }
 
     @Override
     public String toString() {

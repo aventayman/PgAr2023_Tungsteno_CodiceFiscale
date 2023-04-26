@@ -1,18 +1,23 @@
 package it.unibs.fp.codiceFiscale;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws XMLStreamException {
+        /*
         Persona ayman = new Persona("Ayman", "Marpicati", "M", "Brescia", "2003-03-22");
         Persona fede = new Persona("Federico", "Serafini", "M", "Ghedi", "2003-08-11");
         Persona mirko = new Persona("Mirko", "Tedoldi", "M", "Gardone Val Trompia", "2003-08-24");
+        */
 
         XMLInputFactory xmlif;
         XMLStreamReader xmlrComuni = null;
@@ -46,8 +51,7 @@ public class Main {
             System.out.println(e.getMessage());
         }
 
-        Comune.creaMappaComuni(xmlrComuni);
-
+        /*
         CodiceFiscale.creaCodice(ayman);
         CodiceFiscale.creaCodice(mirko);
         CodiceFiscale.creaCodice(fede);
@@ -55,15 +59,37 @@ public class Main {
         System.out.println(ayman.getCodiceFiscale());
         System.out.println(mirko.getCodiceFiscale());
         System.out.println(fede.getCodiceFiscale());
+        */
 
+       // Parsing.inizializzazione(pathCodici, xmlrCodice, xmlif);
+
+        Comune.creaMappaComuni(xmlrComuni);
         List<Persona> popolazione = new ArrayList<>();
-        List<CodiceFiscale> listaCodici = new ArrayList<>();
+        List<CodiceFiscale> codiciFiscali = new ArrayList<>();
 
         Persona.creaPopolazione(popolazione, xmlrPersone);
-        CodiceFiscale.creaListaCodici(xmlrCodice, listaCodici);
+        CodiceFiscale.creaListaCodici(xmlrCodice, codiciFiscali);
 
-        List<CodiceFiscale> codiciFiscali;
-        //System.out.println(popolazione);
+        CodiceFiscale.codiciInvalidi(codiciFiscali);
+        CodiceFiscale.codiciSpaiati(codiciFiscali, popolazione);
+        Persona.isPresente(codiciFiscali, popolazione);
 
+
+
+        XMLOutputFactory xmlof;
+        XMLStreamWriter xmlw = null;
+
+        String pathOutput = "./TestFiles/CodiciPersone.xml";
+
+        try {
+            xmlof = XMLOutputFactory.newInstance();
+            xmlw = xmlof.createXMLStreamWriter(new FileOutputStream(pathOutput), "utf-8");
+            xmlw.writeStartDocument("utf-8", "1.0");
+        } catch (Exception e) {
+            System.out.println("Errore nell'inizializzazione del writer:");
+            System.out.println(e.getMessage());
+        }
+
+        Parsing.Output(popolazione, codiciFiscali, xmlw);
     }
 }

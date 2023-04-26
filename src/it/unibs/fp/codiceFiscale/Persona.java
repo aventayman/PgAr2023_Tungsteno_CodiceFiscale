@@ -4,12 +4,13 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Persona {
     private final String nome, cognome, sesso, comune, dataNascita;
     private CodiceFiscale codiceFiscale;
-    private boolean presente = true;
+    private boolean presente = false;
 
     public Persona(String nome, String cognome, String sesso, String comune, String data)
     {
@@ -72,10 +73,24 @@ public class Persona {
     public static void creaPopolazione (List<Persona> popolazione, XMLStreamReader xmlrPersone) throws XMLStreamException {
         xmlrPersone.next();
         final int NUMERO_PERSONE = Integer.parseInt(xmlrPersone.getAttributeValue(0));
-        //System.out.println(xmlrPersone.getEventType());
-        //System.out.println(xmlrPersone.getLocalName());
         for (int i = 0; i < NUMERO_PERSONE; i++)
             Persona.aggiungiPersona(xmlrPersone, popolazione);
+    }
+
+    /**
+     * Modifica lo stato di presente della persona
+     * Se il codice fiscale della persona è presente nella lista inserita, allora presente diventa true
+     * @param listaCodici
+     * @param popolazione
+     */
+    public static void isPresente (List<CodiceFiscale> listaCodici, List<Persona> popolazione){
+        for (CodiceFiscale codice: listaCodici){
+            for (Persona persona: popolazione){
+                if(persona.getCodiceFiscale().equals(codice)){
+                    persona.presente = true;
+                }
+            }
+        }
     }
 
 
@@ -103,6 +118,10 @@ public class Persona {
 
     public CodiceFiscale getCodiceFiscale() {
         return codiceFiscale;
+    }
+
+    public boolean isPresente() {
+        return presente;
     }
 
     public void setCodiceFiscale(CodiceFiscale codiceFiscale) {
