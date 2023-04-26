@@ -7,7 +7,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.util.List;
 
 public class Persona {
-    private String nome, cognome, sesso, comune, dataNascita, codiceFiscale;
+    private final String nome, cognome, sesso, comune, dataNascita;
+    private CodiceFiscale codiceFiscale;
+    private boolean presente;
 
     public Persona(String nome, String cognome, String sesso, String comune, String data)
     {
@@ -89,11 +91,11 @@ public class Persona {
         return dataNascita;
     }
 
-    public String getCodiceFiscale() {
+    public CodiceFiscale getCodiceFiscale() {
         return codiceFiscale;
     }
 
-    public void setCodiceFiscale(String codiceFiscale) {
+    public void setCodiceFiscale(CodiceFiscale codiceFiscale) {
         this.codiceFiscale = codiceFiscale;
     }
 

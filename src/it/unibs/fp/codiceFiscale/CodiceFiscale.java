@@ -8,66 +8,11 @@ import java.util.*;
 
 
 public class CodiceFiscale {
+    private final String codice;
+    private boolean valido;
 
-    public static Map<String, String> comuni = new HashMap<>();
-
-    /**
-     * Metodo che aggiunge i metodi presi dal file XML in una Hashmap
-     * @param xmlr oggetto XMLStreamReader per decodificare il file XML
-     * @throws XMLStreamException
-     */
-    private static void aggiungiComune(XMLStreamReader xmlr) throws XMLStreamException {
-        String codice, nome;
-        codice = nome = null;
-
-        boolean running = true;
-        while (running) {
-            switch (xmlr.getEventType()) {
-                //Se si tratta di un tag di apertura
-                case (XMLEvent.START_ELEMENT) -> {
-                    switch (xmlr.getLocalName()) {
-                        case ("nome") -> {
-                            //Avanzare di un posto per salvare il nome del paese
-                            xmlr.next();
-                            nome = xmlr.getText().toUpperCase();
-                        }
-                        case ("codice") -> {
-                            //Avanzare di un posto per salvare il codice del paese
-                            xmlr.next();
-                            codice = xmlr.getText().toUpperCase();
-                        }
-                    }
-                }
-                //Se si tratta di un tag di chiusura
-                case (XMLEvent.END_ELEMENT) -> {
-                    //Se è il closing-tag del comune allora termina di controllare per lo specifico comune
-                    if (xmlr.getLocalName().equals("comune"))
-                        running = false;
-
-                    //In ogni caso se è un closing-tag andare al successivo
-                    xmlr.next();
-                }
-            }
-            //Questa condizione serve in modo che non dia un errore perché ci si trova alla fine del file
-            if (xmlr.hasNext())
-                xmlr.next();
-        }
-        comuni.put(nome, codice);
-    }
-
-    /**
-     * Creo la mappa che associa ai comuni i codici identificativi relativi
-     * @param xmlr oggetto XMLStreamReader per decodificare il file dei comuni
-     * @throws XMLStreamException
-     */
-    public static void creaMappaComuni(XMLStreamReader xmlr) throws XMLStreamException {
-        xmlr.next();
-        final int NUMERO_COMUNI = Integer.parseInt(xmlr.getAttributeValue(0));
-        xmlr.next();
-        xmlr.next();
-        for (int i = 0; i < NUMERO_COMUNI; i++){
-            aggiungiComune(xmlr);
-        }
+    public CodiceFiscale(String codice) {
+        this.codice = codice;
     }
 
     /**
@@ -102,6 +47,7 @@ public class CodiceFiscale {
             case "11" -> "S";
             case "12" -> "T";
             //In caso il mese sia sbagliato inseriamo una lettera di controllo
+            //che in caso di verifica darà un codice invalido
             default -> "Z";
         };
         codice.append(letteraMese);
@@ -130,7 +76,7 @@ public class CodiceFiscale {
      */
     private static void aggiungiCodiceComune(StringBuilder codice, String comune){
         comune = comune.toUpperCase();
-        String codiceComune = comuni.get(comune);
+        String codiceComune = Comune.comuni.get(comune);
         codice.append(codiceComune);
     }
 
@@ -245,11 +191,11 @@ public class CodiceFiscale {
             new AbstractMap.SimpleEntry<>('Z', 25)
     );
 
-    private static void aggiungiCarattereControllo(StringBuilder codiceFiscale) {
+    private static char calcoloCarattereControllo(String codiceFiscale) {
         StringBuilder codicePari = new StringBuilder();
         StringBuilder codiceDispari = new StringBuilder();
 
-        for (int i = 0; i < codiceFiscale.length(); i++) {
+        for (int i = 0; i < 15; i++) {
             //Se il carattere è in posizione pari, partendo da uno, aggiungere al codicePari
             if ((i+1) % 2 == 0)
                 codicePari.append(codiceFiscale.charAt(i));
@@ -278,7 +224,7 @@ public class CodiceFiscale {
 
         int resto = somma % 26;
 
-        codiceFiscale.append((char)('A' + resto));
+        return (char) ('A' + resto);
     }
 
     public static void creaCodice(Persona persona) {
@@ -303,9 +249,129 @@ public class CodiceFiscale {
         aggiungiCodiceComune(codiceFiscale, persona.getComune());
 
         //Aggiunta del carattere di controllo
-        aggiungiCarattereControllo(codiceFiscale);
+        codiceFiscale.append(calcoloCarattereControllo(codiceFiscale.toString()));
 
         //Assegnamento del codice fiscale alla persona
-        persona.setCodiceFiscale(codiceFiscale.toString());
+        persona.setCodiceFiscale(new CodiceFiscale(codiceFiscale.toString()));
+    }
+
+    public void codiceValido(CodiceFiscale codiceFiscale) {
+        char [] codice = codiceFiscale.codice.toCharArray();
+        int [] posizioneLettere = {0, 1, 2, 3, 4, 5, 8, 11, 15};
+        int [] posizioneCifre = {6, 7, 9, 10, 12, 13, 14};
+        char [] mesi31 = {'A', 'C', 'E', 'L', 'M', 'R', 'T'};
+        char[] mesi30 = {'S', 'D', 'H', 'P'};
+
+        //Se il codice contiene un numero di caratteri diverso da 16 il codice è invalido
+        if (codice.length != 16) {
+            codiceFiscale.valido = false;
+            return;
+        }
+
+        //Controllo le posizioni di ogni carattere del codice fiscale
+        for (int i = 0; i < 16; i++) {
+            //Se si tratta di una lettera
+            if (codice[i] >= 'A' && codice[i] <= 'Z') {
+                for (int posizioneCifra : posizioneCifre)
+                    //Se la lettera si trova in posizione di una cifra il codice è invalido
+                    if (i == posizioneCifra) {
+                        codiceFiscale.valido = false;
+                        return;
+                    }
+            }
+            //Se si tratta di una cifra
+            else if (codice[i] >= '0' && codice[i] <= '9') {
+                for (int posizioneLettera : posizioneLettere)
+                    //Se la cifra si trova in posizione di una lettera il codice è invalido
+                    if (i == posizioneLettera) {
+                        codiceFiscale.valido = false;
+                        return;
+                    }
+            }
+            //Se si tratta di un qualsiasi altro carattere il codice è invalido
+            else {
+                codiceFiscale.valido = false;
+                return;
+            }
+        }
+
+        //Controllo dell'esistenza del mese e della correttezza dei giorni
+        int giornoNascita = Integer.parseInt(codiceFiscale.codice.substring(9, 11));
+        int annoNascita = Integer.parseInt(codiceFiscale.codice.substring(5, 7));
+        char meseNascita = codice[8];
+
+        boolean meseEsistente = false;
+
+        //Controllo se si tratta di un mese da 30 giorni
+        for (char mese : mesi30) {
+            if (meseNascita == mese) {
+                if (giornoNascita < 1 || (giornoNascita > 30 && giornoNascita < 41) || giornoNascita > 70) {
+                    codiceFiscale.valido = false;
+                    return;
+                }
+                meseEsistente = true;
+            }
+        }
+
+        //Controllo se si tratta di un mese da 31 giorni
+        for (char mese : mesi31) {
+            if (meseNascita == mese) {
+                if (giornoNascita < 1 || (giornoNascita > 31 && giornoNascita < 41) || giornoNascita > 71) {
+                    codiceFiscale.valido = false;
+                    return;
+                }
+                meseEsistente = true;
+            }
+        }
+
+        //Controllo se si tratta di un anno bisestile
+        boolean bisestile;
+        if (annoNascita % 4 == 0) {
+            if (annoNascita % 100 == 0)
+                bisestile = annoNascita % 400 != 0;
+            else
+                bisestile = true;
+        }
+        else
+            bisestile = false;
+
+        //Controllo se si tratta di febbraio
+        if (meseNascita == 'B') {
+            if (bisestile) {
+                if (giornoNascita < 1 || (giornoNascita > 29 && giornoNascita < 41) || giornoNascita > 69) {
+                    codiceFiscale.valido = false;
+                    return;
+                }
+            }
+            else {
+                if (giornoNascita < 1 || (giornoNascita > 28 && giornoNascita < 41) || giornoNascita > 68) {
+                    codiceFiscale.valido = false;
+                    return;
+                }
+            }
+            meseEsistente = true;
+        }
+
+        //Se non è stato trovato il mese allora il codice è invalido
+        if (!meseEsistente) {
+            codiceFiscale.valido = false;
+            return;
+        }
+
+        //Controllo del carattere di controllo
+        char carattereControllo = calcoloCarattereControllo(codiceFiscale.codice);
+
+        if (codice[15] != carattereControllo) {
+            codiceFiscale.valido = false;
+            return;
+        }
+
+        //Se ha superato tutti i controlli ritorna true
+        codiceFiscale.valido = true;
+    }
+
+    @Override
+    public String toString() {
+        return codice;
     }
 }

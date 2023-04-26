@@ -36,7 +36,7 @@ public class Main {
             System.out.println(e.getMessage());
         }
 
-        CodiceFiscale.creaMappaComuni(xmlrComuni);
+        Comune.creaMappaComuni(xmlrComuni);
 
         CodiceFiscale.creaCodice(ayman);
         CodiceFiscale.creaCodice(mirko);
